@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
 import { useProfile } from '../lib/profile-context'
-import { shareUrlFor } from '../lib/share'
+import { toQrJson } from '../lib/share'
 
 export function SharePage() {
   const { profile, updateProfile } = useProfile()
   const [qrSrc, setQrSrc] = useState('')
   const [copied, setCopied] = useState(false)
   const [name, setName] = useState(profile.name)
-  const shareUrl = shareUrlFor({ ...profile, name })
+  const qrJson = toQrJson({ ...profile, name })
 
   useEffect(() => {
     let cancelled = false
-    QRCode.toDataURL(shareUrl, {
+    QRCode.toDataURL(qrJson, {
       width: 520,
       margin: 1,
       color: { dark: '#140c10', light: '#ffffff' },
@@ -22,7 +22,7 @@ export function SharePage() {
     return () => {
       cancelled = true
     }
-  }, [shareUrl])
+  }, [qrJson])
 
   const persistName = () => {
     const trimmed = name.trim()
@@ -33,7 +33,7 @@ export function SharePage() {
     <>
       <p className="eyebrow">Share</p>
       <h1>My QR code</h1>
-      <p className="lede">Someone else can scan this or open your link. The list stays in the link, not on a server.</p>
+      <p className="lede">This code is the same JSON the iPhone app scans. Point the Wink Kard camera at it to compare.</p>
 
       <label className="stack section">
         <span className="muted">Name on your card</span>
@@ -53,13 +53,13 @@ export function SharePage() {
           className="primary"
           onClick={async () => {
             persistName()
-            await navigator.clipboard.writeText(shareUrl)
+            await navigator.clipboard.writeText(qrJson)
             setCopied(true)
             window.setTimeout(() => setCopied(false), 1600)
           }}
           type="button"
         >
-          {copied ? 'Link copied' : 'Copy share link'}
+          {copied ? 'Card copied' : 'Copy card JSON'}
         </button>
       </div>
     </>

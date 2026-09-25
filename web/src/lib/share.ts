@@ -1,9 +1,19 @@
 import type { GuestProfile, SharePayloadV1, UserProfile } from './types'
 
+/** Same JSON the iOS app puts in a QR code. */
+export function toQrJson(profile: UserProfile): string {
+  return JSON.stringify({
+    name: profile.name.trim() || 'Unknown',
+    favoritePositions: profile.positions,
+    intoKinks: profile.intoKinks,
+    wouldTryKinks: profile.wouldTryKinks,
+  })
+}
+
 export function toSharePayload(profile: UserProfile): SharePayloadV1 {
   return {
     v: 1,
-    name: profile.name.trim() || 'Wink Kard',
+    name: profile.name.trim() || 'Unknown',
     orientation: profile.orientation,
     favoritePositions: profile.positions,
     intoKinks: profile.intoKinks,

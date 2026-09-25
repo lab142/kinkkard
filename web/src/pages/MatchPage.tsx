@@ -46,13 +46,9 @@ export function MatchPage() {
         <ChipList items={results.matchingKinks} kind="into" />
       </section>
       <section className="section">
-        <h2>Would-try matches</h2>
+        <h2>Would try matches</h2>
         <p className="lede">One of you is into it, the other would try it.</p>
         <ChipList items={results.wouldTryCrossMatches} kind="try" />
-      </section>
-      <section className="section">
-        <h2>Both would try</h2>
-        <ChipList items={results.bothWouldTryMatches} kind="both" />
       </section>
 
       <div className="section">

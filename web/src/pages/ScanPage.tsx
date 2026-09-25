@@ -5,11 +5,10 @@ import { parseScannedText, payloadToGuest } from '../lib/share'
 import { hasGuestData } from '../lib/types'
 
 const SAMPLE_CARD = JSON.stringify({
-  v: 1,
   name: 'Alex',
-  favoritePositions: ['Switch', 'Top'],
-  intoKinks: ['Bondage', 'Role Play', 'Kissing'],
-  wouldTryKinks: ['Toys', 'Anal Play', 'Wax Play'],
+  favoritePositions: ['Missionary', 'Cowgirl'],
+  intoKinks: ['Bondage', 'Roleplay'],
+  wouldTryKinks: ['Spanking', 'Handcuffs'],
 })
 
 export function ScanPage() {
