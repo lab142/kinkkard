@@ -7,6 +7,7 @@ export function SharePage() {
   const { profile, updateProfile } = useProfile()
   const [qrSrc, setQrSrc] = useState('')
   const [copied, setCopied] = useState(false)
+  const [shared, setShared] = useState(false)
   const [name, setName] = useState(profile.name)
   const qrJson = toQrJson({ ...profile, name })
 
@@ -29,6 +30,28 @@ export function SharePage() {
     if (trimmed !== profile.name) updateProfile({ name: trimmed })
   }
 
+  const shareQr = async () => {
+    persistName()
+    if (!qrSrc) return
+    const blob = await (await fetch(qrSrc)).blob()
+    const file = new File([blob], 'wink-kard.png', { type: 'image/png' })
+    const payload = { files: [file], title: 'Wink Kard' }
+    if (navigator.canShare?.(payload)) {
+      try {
+        await navigator.share(payload)
+        setShared(true)
+        window.setTimeout(() => setShared(false), 1600)
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+      }
+      return
+    }
+    const link = document.createElement('a')
+    link.href = qrSrc
+    link.download = 'wink-kard.png'
+    link.click()
+  }
+
   return (
     <>
       <p className="eyebrow">Share</p>
@@ -49,8 +72,11 @@ export function SharePage() {
       <div className="qr-wrap">{qrSrc ? <img src={qrSrc} alt="Your Wink Kard QR code" /> : <p>Making QR…</p>}</div>
 
       <div className="stack">
+        <button className="primary" disabled={!qrSrc} onClick={() => void shareQr()} type="button">
+          {shared ? 'Shared' : 'Share QR'}
+        </button>
         <button
-          className="primary"
+          className="ghost"
           onClick={async () => {
             persistName()
             await navigator.clipboard.writeText(qrJson)
