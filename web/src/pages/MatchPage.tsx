@@ -51,8 +51,11 @@ export function MatchPage() {
         <ChipList items={results.wouldTryCrossMatches} kind="try" />
       </section>
 
-      <div className="section">
-        <Link className="primary" to="/scan" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+      <div className="section stack">
+        <Link className="primary" to="/play" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+          Let's play a game
+        </Link>
+        <Link className="ghost" to="/scan" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
           Done
         </Link>
       </div>

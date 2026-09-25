@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { MainLayout } from './components/MainLayout'
 import { ProfileProvider, useProfile } from './lib/profile-context'
+import { GamePage } from './pages/GamePage'
 import { ImportPage } from './pages/ImportPage'
 import { MatchPage } from './pages/MatchPage'
 import { OnboardingPage } from './pages/OnboardingPage'
@@ -15,13 +16,16 @@ function AppRoutes() {
     <Routes>
       <Route path="/m" element={<ImportPage />} />
       {isComplete ? (
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<ProfilePage />} />
-          <Route path="/share" element={<SharePage />} />
-          <Route path="/scan" element={<ScanPage />} />
-          <Route path="/match" element={<MatchPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
+        <>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<ProfilePage />} />
+            <Route path="/share" element={<SharePage />} />
+            <Route path="/scan" element={<ScanPage />} />
+            <Route path="/match" element={<MatchPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+          <Route path="/play" element={<GamePage />} />
+        </>
       ) : (
         <Route path="*" element={<OnboardingPage />} />
       )}
