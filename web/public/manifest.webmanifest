@@ -1,0 +1,15 @@
+{
+  "name": "Wink Kard",
+  "short_name": "Wink Kard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#140c10",
+  "theme_color": "#140c10",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
