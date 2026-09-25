@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useProfile } from '../lib/profile-context'
 
 export function ProfilePage() {
@@ -56,7 +57,10 @@ export function ProfilePage() {
         )}
       </section>
 
-      <div className="section">
+      <div className="section stack">
+        <Link className="primary" to="/multiplayer" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+          Multiplayer
+        </Link>
         <button className="danger" onClick={resetOnboarding} type="button">
           Reset onboarding
         </button>
