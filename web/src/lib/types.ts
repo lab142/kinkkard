@@ -1,8 +1,9 @@
-export type OnboardingStep = 'orientation' | 'positions' | 'kinks' | 'complete'
+export type OnboardingStep = 'gender' | 'orientation' | 'positions' | 'kinks' | 'complete'
 
 export type UserProfile = {
   id: string
   name: string
+  gender: string | null
   orientation: string | null
   positions: string[]
   intoKinks: string[]
@@ -39,6 +40,7 @@ export function emptyProfile(): UserProfile {
   return {
     id: crypto.randomUUID(),
     name: '',
+    gender: null,
     orientation: null,
     positions: [],
     intoKinks: [],

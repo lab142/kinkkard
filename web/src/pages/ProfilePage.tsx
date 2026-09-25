@@ -11,6 +11,14 @@ export function ProfilePage() {
       <p className="lede">Saved on this browser. Sign-in sync comes later.</p>
 
       <section className="card section">
+        {profile.gender && (
+          <div className="list-block">
+            <h3>I am a</h3>
+            <div className="chips">
+              <span className="chip muted">{profile.gender}</span>
+            </div>
+          </div>
+        )}
         {profile.orientation && (
           <div className="list-block">
             <h3>Orientation</h3>

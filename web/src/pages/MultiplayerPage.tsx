@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { GenderPicker } from '../components/GenderPicker'
 import { allKinks, availablePositions } from '../lib/catalogs'
 import { useProfile } from '../lib/profile-context'
 import type { GuestProfile } from '../lib/types'
 
-type Step = 'name' | 'positions' | 'kinks' | 'review'
+type Step = 'gender' | 'name' | 'positions' | 'kinks' | 'review'
 
 export function MultiplayerPage() {
   const { setGuest } = useProfile()
   const navigate = useNavigate()
-  const [step, setStep] = useState<Step>('name')
+  const [step, setStep] = useState<Step>('gender')
+  const [gender, setGender] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [positions, setPositions] = useState<string[]>([])
   const [intoKinks, setIntoKinks] = useState<string[]>([])
@@ -39,6 +41,20 @@ export function MultiplayerPage() {
     <div className="app-shell onboarding">
       <p className="eyebrow">Multiplayer</p>
 
+      {step === 'gender' && (
+        <>
+          <GenderPicker value={gender} onChange={setGender} />
+          <div className="footer-action stack">
+            <button className="primary" disabled={!gender} onClick={() => setStep('name')} type="button">
+              Continue
+            </button>
+            <Link className="ghost" to="/" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+              Back to home
+            </Link>
+          </div>
+        </>
+      )}
+
       {step === 'name' && (
         <>
           <h1>Enter guest name</h1>
@@ -57,9 +73,9 @@ export function MultiplayerPage() {
             <button className="primary" disabled={!name.trim()} onClick={() => setStep('positions')} type="button">
               Next
             </button>
-            <Link className="ghost" to="/" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
-              Back to home
-            </Link>
+            <button className="ghost" onClick={() => setStep('gender')} type="button">
+              Back
+            </button>
           </div>
         </>
       )}
@@ -138,6 +154,10 @@ export function MultiplayerPage() {
         <>
           <h1>{name.trim()}</h1>
           <section className="card">
+            <div className="list-block">
+              <h3>I am a</h3>
+              <ChipList items={gender ? [gender] : []} kind="pos" empty="No gender selected" />
+            </div>
             <div className="list-block">
               <h3>Positions</h3>
               <ChipList items={positions} kind="pos" empty="No positions selected" />

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { GenderPicker } from '../components/GenderPicker'
 import { allKinks, availablePositions, orientations } from '../lib/catalogs'
 import { useProfile } from '../lib/profile-context'
 import type { OnboardingStep } from '../lib/types'
@@ -6,10 +7,11 @@ import type { OnboardingStep } from '../lib/types'
 export function OnboardingPage() {
   const { profile, updateProfile } = useProfile()
   const [step, setStep] = useState<Exclude<OnboardingStep, 'complete'>>(() => {
-    if (!profile.hasCompletedOrientation) return 'orientation'
+    if (!profile.hasCompletedOrientation) return 'gender'
     if (!profile.hasCompletedPositions) return 'positions'
     return 'kinks'
   })
+  const [gender, setGender] = useState<string | null>(profile.gender)
   const [orientation, setOrientation] = useState<string | null>(profile.orientation)
   const [positions, setPositions] = useState<string[]>(profile.positions)
   const [intoKinks, setIntoKinks] = useState<string[]>(profile.intoKinks)
@@ -39,15 +41,36 @@ export function OnboardingPage() {
     <div className="app-shell onboarding">
       <p className="eyebrow">Wink Kard</p>
       <div className="step-dots" aria-hidden="true">
-        <i className={step === 'orientation' || step === 'positions' || step === 'kinks' ? 'on' : ''} />
+        <i className="on" />
+        <i className={step !== 'gender' ? 'on' : ''} />
         <i className={step === 'positions' || step === 'kinks' ? 'on' : ''} />
         <i className={step === 'kinks' ? 'on' : ''} />
       </div>
 
+      {step === 'gender' && (
+        <>
+          <GenderPicker value={gender} onChange={setGender} />
+          <div className="footer-action">
+            <button
+              className="primary"
+              disabled={!gender}
+              onClick={() => {
+                if (!gender) return
+                updateProfile({ gender })
+                setStep('orientation')
+              }}
+              type="button"
+            >
+              Continue
+            </button>
+          </div>
+        </>
+      )}
+
       {step === 'orientation' && (
         <>
-          <h1>Welcome to Wink Kard</h1>
-          <p className="lede">Let’s start with your orientation.</p>
+          <h1>What is your orientation?</h1>
+          <p className="lede">Pick the one that fits.</p>
           <div className="scroll">
             {orientations.map((item) => (
               <button

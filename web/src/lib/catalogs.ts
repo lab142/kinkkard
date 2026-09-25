@@ -10,6 +10,19 @@ export const orientations = [
   'Demisexual',
 ] as const
 
+export const mainGenders = ['Man', 'Woman'] as const
+
+export const moreGenders = [
+  'Non-binary',
+  'Trans Man',
+  'Trans Woman',
+  'Genderfluid',
+  'Agender',
+  'Two-Spirit',
+  'Bigender',
+  'Other',
+] as const
+
 export const availablePositions = [
   'Missionary',
   'Doggy Style',
