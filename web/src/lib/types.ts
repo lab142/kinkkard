@@ -1,4 +1,4 @@
-export type OnboardingStep = 'gender' | 'orientation' | 'positions' | 'kinks' | 'complete'
+export type OnboardingStep = 'splash' | 'gender' | 'orientation' | 'name' | 'positions' | 'kinks' | 'complete'
 
 export type UserProfile = {
   id: string

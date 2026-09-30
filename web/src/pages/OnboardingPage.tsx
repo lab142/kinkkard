@@ -7,12 +7,14 @@ import type { OnboardingStep } from '../lib/types'
 export function OnboardingPage() {
   const { profile, updateProfile } = useProfile()
   const [step, setStep] = useState<Exclude<OnboardingStep, 'complete'>>(() => {
-    if (!profile.hasCompletedOrientation) return 'gender'
+    if (!profile.gender && !profile.hasCompletedOrientation) return 'splash'
+    if (!profile.hasCompletedOrientation) return profile.gender ? 'orientation' : 'gender'
     if (!profile.hasCompletedPositions) return 'positions'
     return 'kinks'
   })
   const [gender, setGender] = useState<string | null>(profile.gender)
   const [orientation, setOrientation] = useState<string | null>(profile.orientation)
+  const [name, setName] = useState(profile.name)
   const [positions, setPositions] = useState<string[]>(profile.positions)
   const [intoKinks, setIntoKinks] = useState<string[]>(profile.intoKinks)
   const [wouldTryKinks, setWouldTryKinks] = useState<string[]>(profile.wouldTryKinks)
@@ -40,6 +42,23 @@ export function OnboardingPage() {
   return (
     <div className="app-shell onboarding">
       <p className="eyebrow">Wink Kard</p>
+      {step === 'splash' && (
+        <>
+          <h1>Welcome to Wink Kard</h1>
+          <div className="card section">
+            <p>All data is stored in this browser. Your card is not sent to a server.</p>
+            <p>Discover and match with someone else by QR code or on this phone.</p>
+            <p>Your privacy stays on this device.</p>
+          </div>
+          <div className="footer-action">
+            <button className="primary" onClick={() => setStep('gender')} type="button">
+              Get started
+            </button>
+          </div>
+        </>
+      )}
+      {step !== 'splash' && (
+      <>
       <div className="step-dots" aria-hidden="true">
         <i className="on" />
         <i className={step !== 'gender' ? 'on' : ''} />
@@ -90,10 +109,30 @@ export function OnboardingPage() {
               disabled={!orientation}
               onClick={() => {
                 if (!orientation) return
-                updateProfile({
-                  orientation,
-                  hasCompletedOrientation: true,
-                })
+                updateProfile({ orientation })
+                setStep('name')
+              }}
+              type="button"
+            >
+              Continue
+            </button>
+          </div>
+        </>
+      )}
+
+      {step === 'name' && (
+        <>
+          <h1>What is your name?</h1>
+          <label className="stack section">
+            <span className="muted">Name on your card</span>
+            <input className="field" value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" />
+          </label>
+          <div className="footer-action">
+            <button
+              className="primary"
+              disabled={!name.trim()}
+              onClick={() => {
+                updateProfile({ name: name.trim(), orientation, hasCompletedOrientation: true })
                 setStep('positions')
               }}
               type="button"
@@ -200,6 +239,8 @@ export function OnboardingPage() {
             </button>
           </div>
         </>
+      )}
+      </>
       )}
     </div>
   )

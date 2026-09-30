@@ -69,6 +69,12 @@ export function ProfilePage() {
         <Link className="primary" to="/multiplayer" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
           Multiplayer
         </Link>
+        <Link className="ghost" to="/discover" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+          Kink discovery
+        </Link>
+        <Link className="ghost" to="/settings" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+          Settings
+        </Link>
         <button className="danger" onClick={resetOnboarding} type="button">
           Reset onboarding
         </button>

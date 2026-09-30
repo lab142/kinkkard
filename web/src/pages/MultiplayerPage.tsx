@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { GenderPicker } from '../components/GenderPicker'
-import { allKinks, availablePositions } from '../lib/catalogs'
+import { allKinks, availablePositions, kinkCatalog } from '../lib/catalogs'
 import { useProfile } from '../lib/profile-context'
 import type { GuestProfile } from '../lib/types'
 
-type Step = 'gender' | 'name' | 'positions' | 'kinks' | 'review'
+type Step = 'gender' | 'name' | 'positions' | 'kinks' | 'discover' | 'review'
 
 export function MultiplayerPage() {
   const { setGuest } = useProfile()
@@ -16,6 +16,7 @@ export function MultiplayerPage() {
   const [positions, setPositions] = useState<string[]>([])
   const [intoKinks, setIntoKinks] = useState<string[]>([])
   const [wouldTryKinks, setWouldTryKinks] = useState<string[]>([])
+  const [discoverIndex, setDiscoverIndex] = useState(0)
 
   const togglePosition = (position: string) => {
     setPositions((current) =>
@@ -143,8 +144,52 @@ export function MultiplayerPage() {
             <button className="primary" onClick={() => setStep('review')} type="button">
               Next
             </button>
+            <button
+              className="ghost"
+              onClick={() => {
+                setDiscoverIndex(0)
+                setStep('discover')
+              }}
+              type="button"
+            >
+              Discover one at a time
+            </button>
             <button className="ghost" onClick={() => setStep('positions')} type="button">
               Back
+            </button>
+          </div>
+        </>
+      )}
+
+      {step === 'discover' && (
+        <>
+          <h1>Discover kinks</h1>
+          {discoverIndex >= kinkCatalog.length ? (
+            <p className="lede">You've explored all kinks.</p>
+          ) : (
+            <section className="card section">
+              <h2>{kinkCatalog[discoverIndex].name}</h2>
+              <p className="lede">{kinkCatalog[discoverIndex].description}</p>
+              <div className="stack section">
+                <button className="ghost" onClick={() => setDiscoverIndex((current) => current + 1)} type="button">
+                  Skip
+                </button>
+                <button
+                  className="primary"
+                  onClick={() => {
+                    setKinkBucket(kinkCatalog[discoverIndex].name, 'into')
+                    setDiscoverIndex((current) => current + 1)
+                  }}
+                  type="button"
+                >
+                  Like
+                </button>
+              </div>
+            </section>
+          )}
+          <div className="footer-action">
+            <button className="primary" onClick={() => setStep('review')} type="button">
+              Finish
             </button>
           </div>
         </>
