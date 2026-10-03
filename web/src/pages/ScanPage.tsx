@@ -29,6 +29,7 @@ export function ScanPage() {
       }
       setGuest(payloadToGuest(payload))
       setError('')
+      navigator.vibrate?.(40)
       navigate('/match')
       return true
     },
