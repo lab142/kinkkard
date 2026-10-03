@@ -110,6 +110,86 @@ export function kinkCardText(profile: UserProfile): string {
   ].join('\n')
 }
 
+export function cardImageBlob(profile: UserProfile): Promise<Blob> {
+  const canvas = document.createElement('canvas')
+  canvas.width = 1200
+  canvas.height = 1600
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return Promise.reject(new Error('Could not draw the card'))
+
+  const gradient = ctx.createLinearGradient(0, 0, 1200, 1600)
+  gradient.addColorStop(0, '#7c3aed')
+  gradient.addColorStop(1, '#000000')
+  roundRect(ctx, 0, 0, 1200, 1600, 40)
+  ctx.fillStyle = gradient
+  ctx.fill()
+
+  ctx.fillStyle = '#ffffff'
+  ctx.font = '700 64px sans-serif'
+  ctx.fillText(profile.name.trim() || 'Your Name', 60, 120)
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.35)'
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.moveTo(60, 170)
+  ctx.lineTo(1140, 170)
+  ctx.stroke()
+
+  let y = 250
+  y = drawSection(ctx, y, 'Favorite Positions', profile.positions, 'No positions selected')
+  y = drawSection(ctx, y, 'Into', profile.intoKinks, 'No kinks selected')
+  drawSection(ctx, y, 'Would Try', profile.wouldTryKinks, 'No kinks selected')
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob)
+      else reject(new Error('Could not draw the card'))
+    }, 'image/png')
+  })
+}
+
+function drawSection(ctx: CanvasRenderingContext2D, y: number, title: string, items: string[], empty: string): number {
+  ctx.fillStyle = '#ffffff'
+  ctx.font = '600 40px sans-serif'
+  ctx.fillText(title, 60, y)
+  y += 56
+  ctx.font = '400 32px sans-serif'
+  ctx.fillStyle = items.length ? '#ffffff' : '#c9b4bb'
+  const lines = wrapText(ctx, items.length ? items.join(', ') : empty, 1080)
+  for (const line of lines.slice(0, 6)) {
+    ctx.fillText(line, 60, y)
+    y += 46
+  }
+  return y + 36
+}
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split(' ')
+  const lines: string[] = []
+  let line = ''
+  for (const word of words) {
+    const next = line ? `${line} ${word}` : word
+    if (ctx.measureText(next).width > maxWidth && line) {
+      lines.push(line)
+      line = word
+    } else {
+      line = next
+    }
+  }
+  if (line) lines.push(line)
+  return lines
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
+  ctx.beginPath()
+  ctx.moveTo(x + radius, y)
+  ctx.arcTo(x + width, y, x + width, y + height, radius)
+  ctx.arcTo(x + width, y + height, x, y + height, radius)
+  ctx.arcTo(x, y + height, x, y, radius)
+  ctx.arcTo(x, y, x + width, y, radius)
+  ctx.closePath()
+}
+
 export function shareUrlFor(profile: UserProfile): string {
   const encoded = encodePayload(toSharePayload(profile))
   return `${window.location.origin}/m#${encoded}`

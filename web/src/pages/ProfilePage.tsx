@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useProfile } from '../lib/profile-context'
-import { kinkCardText } from '../lib/share'
+import { cardImageBlob, kinkCardText } from '../lib/share'
 
 export function ProfilePage() {
   const { profile, resetOnboarding } = useProfile()
   const [shared, setShared] = useState(false)
+  const [imageShared, setImageShared] = useState(false)
 
   const shareCard = async () => {
     const text = kinkCardText(profile)
@@ -22,6 +23,29 @@ export function ProfilePage() {
     await navigator.clipboard.writeText(text)
     setShared(true)
     window.setTimeout(() => setShared(false), 1600)
+  }
+
+  const shareCardImage = async () => {
+    const blob = await cardImageBlob(profile)
+    const file = new File([blob], 'wink-kard.png', { type: 'image/png' })
+    const payload = { files: [file], title: 'Wink Kard' }
+    if (navigator.canShare?.(payload)) {
+      try {
+        await navigator.share(payload)
+        setImageShared(true)
+        window.setTimeout(() => setImageShared(false), 1600)
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+      }
+      return
+    }
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = 'wink-kard.png'
+    link.click()
+    window.setTimeout(() => URL.revokeObjectURL(link.href), 1000)
+    setImageShared(true)
+    window.setTimeout(() => setImageShared(false), 1600)
   }
 
   return (
@@ -71,6 +95,9 @@ export function ProfilePage() {
         </Link>
         <button className="primary" onClick={() => void shareCard()} type="button">
           {shared ? 'Shared' : 'Share card'}
+        </button>
+        <button className="ghost" onClick={() => void shareCardImage()} type="button">
+          {imageShared ? 'Shared' : 'Share card image'}
         </button>
         <Link className="primary" to="/multiplayer" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
           Multiplayer
