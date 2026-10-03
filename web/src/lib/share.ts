@@ -14,7 +14,7 @@ export function toSharePayload(profile: UserProfile): SharePayloadV1 {
   return {
     v: 1,
     name: profile.name.trim() || 'Unknown',
-    orientation: profile.orientation,
+    orientations: profile.orientations,
     favoritePositions: profile.positions,
     intoKinks: profile.intoKinks,
     wouldTryKinks: profile.wouldTryKinks,
@@ -49,11 +49,11 @@ export function parseShareJson(raw: string): SharePayloadV1 | null {
     const favoritePositions = asStringArray(decoded.favoritePositions)
     const intoKinks = asStringArray(decoded.intoKinks)
     const wouldTryKinks = asStringArray(decoded.wouldTryKinks)
-    const orientation = typeof decoded.orientation === 'string' ? decoded.orientation : null
+    const orientations = asStringArray(decoded.orientations ?? decoded.orientation)
     return {
       v: 1,
       name,
-      orientation,
+      orientations,
       favoritePositions,
       intoKinks,
       wouldTryKinks,
@@ -87,6 +87,27 @@ export function parseScannedText(text: string): SharePayloadV1 | null {
 
   if (trimmed.startsWith('{')) return parseShareJson(trimmed)
   return decodePayload(trimmed)
+}
+
+export function kinkCardText(profile: UserProfile): string {
+  const name = profile.name.trim() || 'Unknown User'
+  const positions = profile.positions.length ? profile.positions.join(', ') : 'No positions selected'
+  const into = profile.intoKinks.length ? profile.intoKinks.join(', ') : 'No kinks selected'
+  const wouldTry = profile.wouldTryKinks.length ? profile.wouldTryKinks.join(', ') : 'No kinks selected'
+  return [
+    `🔥 Kink Card for ${name} 🔥`,
+    '',
+    '🛏️ Favorite Positions:',
+    positions,
+    '',
+    '🔥 Into:',
+    into,
+    '',
+    '💡 Would Try:',
+    wouldTry,
+    '',
+    '✨ Generated with Kink List App ✨',
+  ].join('\n')
 }
 
 export function shareUrlFor(profile: UserProfile): string {

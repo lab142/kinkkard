@@ -8,7 +8,6 @@ export function SettingsPage() {
   const { profile, updateProfile, resetOnboarding } = useProfile()
   const navigate = useNavigate()
   const [name, setName] = useState(profile.name)
-  const [allowData, setAllowData] = useState(() => localStorage.getItem(PRIVACY_KEY) === 'true')
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   return (
@@ -28,6 +27,9 @@ export function SettingsPage() {
             onBlur={() => updateProfile({ name: name.trim() })}
           />
         </label>
+        <Link className="choice" to="/privacy">
+          Privacy and security
+        </Link>
         <Link className="choice" to="/privacy-policy">
           Privacy policy
         </Link>
@@ -35,18 +37,6 @@ export function SettingsPage() {
           About Wink Kard
         </Link>
       </div>
-      <label className="choice section">
-        <span>Allow data collection</span>
-        <input
-          type="checkbox"
-          checked={allowData}
-          onChange={(event) => {
-            setAllowData(event.target.checked)
-            localStorage.setItem(PRIVACY_KEY, String(event.target.checked))
-          }}
-        />
-      </label>
-      <p className="lede">This stays on this browser. The site does not upload your card.</p>
       {!confirmDelete ? (
         <button className="danger section" onClick={() => setConfirmDelete(true)} type="button">
           Delete all data

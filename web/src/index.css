@@ -148,8 +148,44 @@ h2 {
   gap: 10px;
 }
 
+.kink-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .kink-row span {
   font-weight: 600;
+}
+
+.info-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  z-index: 20;
+}
+
+.modal-card {
+  width: min(420px, 100%);
+  background: var(--bg-elev);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: grid;
+  gap: 12px;
 }
 
 .kink-actions {

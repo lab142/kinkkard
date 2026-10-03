@@ -20,6 +20,31 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
+function readProfile(): UserProfile {
+  const fallback = emptyProfile()
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY)
+    if (!raw) return fallback
+    const data = JSON.parse(raw) as Partial<UserProfile> & { orientation?: string | string[] | null }
+    const stored = data.orientations ?? data.orientation
+    const orientations = Array.isArray(stored)
+      ? stored.filter((item): item is string => typeof item === 'string')
+      : typeof stored === 'string' && stored
+        ? [stored]
+        : []
+    return {
+      ...fallback,
+      ...data,
+      orientations,
+      positions: Array.isArray(data.positions) ? data.positions : [],
+      intoKinks: Array.isArray(data.intoKinks) ? data.intoKinks : [],
+      wouldTryKinks: Array.isArray(data.wouldTryKinks) ? data.wouldTryKinks : [],
+    }
+  } catch {
+    return fallback
+  }
+}
+
 function writeJson(key: string, value: unknown) {
   localStorage.setItem(key, JSON.stringify(value))
 }
@@ -38,9 +63,7 @@ type ProfileContextValue = {
 const ProfileContext = createContext<ProfileContextValue | null>(null)
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfileState] = useState<UserProfile>(() =>
-    readJson(PROFILE_KEY, emptyProfile()),
-  )
+  const [profile, setProfileState] = useState<UserProfile>(() => readProfile())
   const [guest, setGuestState] = useState<GuestProfile>(() => readJson(GUEST_KEY, emptyGuest()))
 
   const setProfile = useCallback((next: UserProfile) => {

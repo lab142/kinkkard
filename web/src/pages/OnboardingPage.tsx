@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { GenderPicker } from '../components/GenderPicker'
-import { allKinks, availablePositions, orientations } from '../lib/catalogs'
+import { KinkChecklist } from '../components/KinkChecklist'
+import { availablePositions, orientations } from '../lib/catalogs'
 import { useProfile } from '../lib/profile-context'
 import type { OnboardingStep } from '../lib/types'
 
@@ -13,30 +14,22 @@ export function OnboardingPage() {
     return 'kinks'
   })
   const [gender, setGender] = useState<string | null>(profile.gender)
-  const [orientation, setOrientation] = useState<string | null>(profile.orientation)
+  const [selectedOrientations, setSelectedOrientations] = useState<string[]>(profile.orientations)
   const [name, setName] = useState(profile.name)
   const [positions, setPositions] = useState<string[]>(profile.positions)
   const [intoKinks, setIntoKinks] = useState<string[]>(profile.intoKinks)
   const [wouldTryKinks, setWouldTryKinks] = useState<string[]>(profile.wouldTryKinks)
-  const [search, setSearch] = useState('')
 
-  const filteredKinks = useMemo(() => {
-    const query = search.trim().toLowerCase()
-    if (!query) return allKinks
-    return allKinks.filter((kink) => kink.toLowerCase().includes(query))
-  }, [search])
+  const toggleOrientation = (item: string) => {
+    setSelectedOrientations((current) =>
+      current.includes(item) ? current.filter((value) => value !== item) : [...current, item],
+    )
+  }
 
   const togglePosition = (position: string) => {
     setPositions((current) =>
       current.includes(position) ? current.filter((item) => item !== position) : [...current, position],
     )
-  }
-
-  const setKinkBucket = (kink: string, bucket: 'into' | 'wouldTry' | null) => {
-    setIntoKinks((current) => current.filter((item) => item !== kink))
-    setWouldTryKinks((current) => current.filter((item) => item !== kink))
-    if (bucket === 'into') setIntoKinks((current) => [...current, kink])
-    if (bucket === 'wouldTry') setWouldTryKinks((current) => [...current, kink])
   }
 
   return (
@@ -69,7 +62,7 @@ export function OnboardingPage() {
       {step === 'gender' && (
         <>
           <GenderPicker value={gender} onChange={setGender} />
-          <div className="footer-action">
+          <div className="footer-action stack">
             <button
               className="primary"
               disabled={!gender}
@@ -82,20 +75,23 @@ export function OnboardingPage() {
             >
               Continue
             </button>
+            <button className="ghost" onClick={() => setStep('splash')} type="button">
+              Back
+            </button>
           </div>
         </>
       )}
 
       {step === 'orientation' && (
         <>
-          <h1>What is your orientation?</h1>
-          <p className="lede">Pick the one that fits.</p>
+          <h1>My sexual orientation is</h1>
+          <p className="lede">Choose every option that fits.</p>
           <div className="scroll">
             {orientations.map((item) => (
               <button
                 key={item}
-                className={orientation === item ? 'choice selected' : 'choice'}
-                onClick={() => setOrientation(item)}
+                className={selectedOrientations.includes(item) ? 'choice selected' : 'choice'}
+                onClick={() => toggleOrientation(item)}
                 type="button"
               >
                 {item}
@@ -103,18 +99,20 @@ export function OnboardingPage() {
               </button>
             ))}
           </div>
-          <div className="footer-action">
+          <div className="footer-action stack">
             <button
               className="primary"
-              disabled={!orientation}
+              disabled={selectedOrientations.length === 0}
               onClick={() => {
-                if (!orientation) return
-                updateProfile({ orientation })
+                updateProfile({ orientations: selectedOrientations })
                 setStep('name')
               }}
               type="button"
             >
               Continue
+            </button>
+            <button className="ghost" onClick={() => setStep('gender')} type="button">
+              Back
             </button>
           </div>
         </>
@@ -127,17 +125,24 @@ export function OnboardingPage() {
             <span className="muted">Name on your card</span>
             <input className="field" value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" />
           </label>
-          <div className="footer-action">
+          <div className="footer-action stack">
             <button
               className="primary"
               disabled={!name.trim()}
               onClick={() => {
-                updateProfile({ name: name.trim(), orientation, hasCompletedOrientation: true })
+                updateProfile({
+                  name: name.trim(),
+                  orientations: selectedOrientations,
+                  hasCompletedOrientation: true,
+                })
                 setStep('positions')
               }}
               type="button"
             >
               Continue
+            </button>
+            <button className="ghost" onClick={() => setStep('orientation')} type="button">
+              Back
             </button>
           </div>
         </>
@@ -160,10 +165,9 @@ export function OnboardingPage() {
               </button>
             ))}
           </div>
-          <div className="footer-action">
+          <div className="footer-action stack">
             <button
               className="primary"
-              disabled={positions.length === 0}
               onClick={() => {
                 updateProfile({
                   positions,
@@ -173,7 +177,10 @@ export function OnboardingPage() {
               }}
               type="button"
             >
-              Continue
+              Next
+            </button>
+            <button className="ghost" onClick={() => setStep('name')} type="button">
+              Back
             </button>
           </div>
         </>
@@ -181,51 +188,19 @@ export function OnboardingPage() {
 
       {step === 'kinks' && (
         <>
-          <h1>Select your interests</h1>
-          <p className="lede">Mark what you’re into, and what you’d try.</p>
-          <div className="search">
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search kinks..."
-              aria-label="Search kinks"
-            />
-          </div>
-          <div className="scroll">
-            {filteredKinks.map((kink) => {
-              const into = intoKinks.includes(kink)
-              const wouldTry = wouldTryKinks.includes(kink)
-              return (
-                <div className="kink-row" key={kink}>
-                  <span>{kink}</span>
-                  <div className="kink-actions">
-                    <button
-                      className={into ? 'pill active-into' : 'pill'}
-                      onClick={() => setKinkBucket(kink, into ? null : 'into')}
-                      type="button"
-                      aria-pressed={into}
-                      aria-label={`${kink}: into`}
-                    >
-                      Into
-                    </button>
-                    <button
-                      className={wouldTry ? 'pill active-try' : 'pill'}
-                      onClick={() => setKinkBucket(kink, wouldTry ? null : 'wouldTry')}
-                      type="button"
-                      aria-pressed={wouldTry}
-                      aria-label={`${kink}: would try`}
-                    >
-                      Would try
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-          <div className="footer-action">
+          <h1>I am into...</h1>
+          <p className="lede">Mark what you’re into, and what you’d try. Tap ? for a description.</p>
+          <KinkChecklist
+            intoKinks={intoKinks}
+            wouldTryKinks={wouldTryKinks}
+            onChange={(into, wouldTry) => {
+              setIntoKinks(into)
+              setWouldTryKinks(wouldTry)
+            }}
+          />
+          <div className="footer-action stack">
             <button
               className="primary"
-              disabled={intoKinks.length + wouldTryKinks.length === 0}
               onClick={() => {
                 updateProfile({
                   intoKinks,
@@ -235,7 +210,10 @@ export function OnboardingPage() {
               }}
               type="button"
             >
-              Complete setup
+              Next
+            </button>
+            <button className="ghost" onClick={() => setStep('positions')} type="button">
+              Back
             </button>
           </div>
         </>

@@ -8,7 +8,7 @@ type MotionEventWithPermission = typeof DeviceMotionEvent & {
 }
 
 export function GamePage() {
-  const { profile, guest } = useProfile()
+  const { profile, guest, updateProfile } = useProfile()
   const results = calculateMatches(profile, guest)
   const pool = [
     ...results.matchingPositions,
@@ -19,6 +19,8 @@ export function GamePage() {
   const [spinning, setSpinning] = useState(false)
   const [empty, setEmpty] = useState(false)
   const usedRef = useRef<Set<string>>(new Set())
+  const profileRef = useRef(profile)
+  profileRef.current = profile
   const spinningRef = useRef(false)
   const listeningRef = useRef(false)
   const playRef = useRef<() => void>(() => undefined)
@@ -45,6 +47,11 @@ export function GamePage() {
       const next = available[Math.floor(Math.random() * available.length)]
       usedRef.current.add(next)
       setPick(next)
+      const current = profileRef.current
+      updateProfile({
+        intoKinks: current.intoKinks.includes(next) ? current.intoKinks : [...current.intoKinks, next],
+        wouldTryKinks: current.wouldTryKinks.filter((item) => item !== next),
+      })
       setSpinning(false)
       spinningRef.current = false
     }, 1000)

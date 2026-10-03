@@ -4,7 +4,7 @@ export type UserProfile = {
   id: string
   name: string
   gender: string | null
-  orientation: string | null
+  orientations: string[]
   positions: string[]
   intoKinks: string[]
   wouldTryKinks: string[]
@@ -23,7 +23,7 @@ export type GuestProfile = {
 export type SharePayloadV1 = {
   v: 1
   name: string
-  orientation?: string | null
+  orientations?: string[]
   favoritePositions: string[]
   intoKinks: string[]
   wouldTryKinks: string[]
@@ -41,7 +41,7 @@ export function emptyProfile(): UserProfile {
     id: crypto.randomUUID(),
     name: '',
     gender: null,
-    orientation: null,
+    orientations: [],
     positions: [],
     intoKinks: [],
     wouldTryKinks: [],
